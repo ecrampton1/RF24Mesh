@@ -38,23 +38,12 @@
 
 
 #include "RF24Mesh_config.h"
-
-#if defined (__linux) && !defined(__ARDUINO_X86__)
-  #include <RF24/RF24.h>
-  #include <RF24Network/RF24Network.h>
-  #define RF24_LINUX
-#else
-  #include <RF24.h>
-  #include <RF24Network.h>
-#endif
-
-  #include <stddef.h>
-  #include <stdint.h>
+#include "RF24Network.h"
+#include <stddef.h>
+#include <stdint.h>
 
 
 
-class RF24;
-class RF24Network;
 
 
 class RF24Mesh
@@ -80,7 +69,7 @@ public:
    * @param _network The underlying network instance
    */
 
-  RF24Mesh( RF24& _radio,RF24Network& _network );
+  RF24Mesh( );
   
   /**
    * Call this in setup() to configure the mesh and request an address.  <br>
@@ -93,7 +82,7 @@ public:
    * @param data_rate The data rate (RF24_250KBPS,RF24_1MBPS,RF24_2MBPS) default:RF24_1MBPS
    * @param timeout How long to attempt address renewal in milliseconds default:60000
    */
-  bool begin(uint8_t channel = MESH_DEFAULT_CHANNEL, rf24_datarate_e data_rate = RF24_1MBPS, uint32_t timeout=MESH_RENEWAL_TIMEOUT );
+  bool begin(uint32_t timeout=MESH_RENEWAL_TIMEOUT );
   
   /**
    * Very similar to network.update(), it needs to be called regularly to keep the network
@@ -179,7 +168,7 @@ public:
    * The assigned RF24Network (Octal) address of this node
    * @return Returns an unsigned 16-bit integer containing the RF24Network address in octal format
    */
-  uint16_t mesh_address; 
+  static uint16_t mesh_address;
   
   /**
    * Convert a nodeID into an RF24Network address
@@ -200,7 +189,7 @@ public:
   /**
   * Change the active radio channel after the mesh has been started.
   */
-  void setChannel(uint8_t _channel);
+  //void setChannel(uint8_t _channel);
   
   /**
   * Allow child nodes to discover and attach to this node.
@@ -238,13 +227,13 @@ public:
 
   uint8_t _nodeID;
 
-  
-#if !defined RF24TINY  
+
+#if !defined RF24TINY
   typedef struct{
 	uint8_t nodeID;       /**< NodeIDs and addresses are stored in the addrList array using this structure */
 	uint16_t address;  /**< NodeIDs and addresses are stored in the addrList array using this structure */
   }addrListStruct;
-  
+
   // Pointer used for dynamic memory allocation of address list
   addrListStruct *addrList;  /**< See the addrListStruct class reference */
   uint8_t addrListTop;       /**< The number of entries in the assigned address list */
@@ -263,15 +252,13 @@ public:
   void setStaticAddress(uint8_t nodeID, uint16_t address);
   
   private:
-  RF24& radio;
-  RF24Network& network;  
+  //RF24& radio;
+  //RF24Network& network;
   bool findNodes(RF24NetworkHeader& header, uint8_t level, uint16_t *address); /**< Broadcasts to all multicast levels to find available nodes **/
   bool requestAddress(uint8_t level); /**< Actual requesting of the address once a contact node is discovered or supplied **/
   bool waitForAvailable(uint32_t timeout); /**< Waits for data to become available */
   bool doDHCP; /**< Indicator that an address request is available */
-  uint32_t lastSaveTime;
-  uint32_t lastFileSave;
-  uint8_t radio_channel;
+  //uint8_t radio_channel;
   uint16_t lastID,lastAddress;
 
  };
