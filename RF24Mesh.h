@@ -69,7 +69,7 @@ public:
    * @param _network The underlying network instance
    */
 
-  RF24Mesh( );
+  //RF24Mesh( );
   
   /**
    * Call this in setup() to configure the mesh and request an address.  <br>
@@ -82,13 +82,13 @@ public:
    * @param data_rate The data rate (RF24_250KBPS,RF24_1MBPS,RF24_2MBPS) default:RF24_1MBPS
    * @param timeout How long to attempt address renewal in milliseconds default:60000
    */
-  bool begin(uint32_t timeout=MESH_RENEWAL_TIMEOUT );
+  static bool begin(uint32_t timeout=MESH_RENEWAL_TIMEOUT );
   
   /**
    * Very similar to network.update(), it needs to be called regularly to keep the network
    * and the mesh going.
    */   
-  uint8_t update();
+  static uint8_t update();
   
   /**
    * Automatically construct a header and send a payload
@@ -104,7 +104,7 @@ public:
    * @param nodeID **Optional**: The nodeID of the recipient if not sending to master
    * @return True if success, False if failed
    */
-  bool write(const void* data, uint8_t msg_type, size_t size, uint8_t nodeID=0);
+  static bool write(const void* data, uint8_t msg_type, size_t size, uint8_t nodeID=0);
   
   /**
    * Set a unique nodeID for this node. This value is stored in program memory, so is saved after loss of power.  
@@ -113,13 +113,13 @@ public:
    * @note If using RF24Gateway and/or RF24Ethernet, nodeIDs 0 & 1 are used by the master node.
    * @param nodeID Can be any unique value ranging from 1 to 255. 
    */
-  void setNodeID(uint8_t nodeID);
+  static void setNodeID(uint8_t nodeID);
   
  /**
   * Only to be used on the master node. Provides automatic configuration for sensor nodes, similar to DHCP.
   * Call immediately after calling network.update() to ensure address requests are handled appropriately
   */  
-  void DHCP();
+  static void DHCP();
   
   /**@}*/
   /**
@@ -134,7 +134,8 @@ public:
    * @param address If no address is provided, returns the local nodeID, otherwise a lookup request is sent to the master node
    * @return Returns the unique identifier (1-255) or -1 if not found.
    */
-  int16_t getNodeID(uint16_t address=MESH_BLANK_ID);
+  //static int16_t getNodeID(uint16_t address=MESH_BLANK_ID);
+  static int16_t getNodeID();
   
   /**
    * Tests connectivity of this node to the mesh.
@@ -142,7 +143,7 @@ public:
    * @return Return 1 if connected, 0 if mesh not responding after up to 1 second
    */
   
-  bool checkConnection();
+  static bool checkConnection();
   
   /**
   * Reconnect to the mesh and renew the current RF24Network address. Used to re-establish a connection to the mesh if physical location etc. has changed, or
@@ -155,14 +156,14 @@ public:
   
   * @return Returns the newly assigned RF24Network address
   */
-  uint16_t renewAddress(uint32_t timeout=MESH_RENEWAL_TIMEOUT);
+  static uint16_t renewAddress(uint32_t timeout=MESH_RENEWAL_TIMEOUT);
   
   /**
    * Releases the currently assigned address lease. Useful for nodes that will be sleeping etc.
    * @note Nodes should ensure that addresses are releases successfully prior to renewal.
    * @return Returns 1 if successfully released, 0 if not
    */
-  bool releaseAddress();
+  static bool releaseAddress();
   
   /**
    * The assigned RF24Network (Octal) address of this node
@@ -178,13 +179,13 @@ public:
    * @param nodeID - The unique identifier (1-255) of the node
    * @return Returns the RF24Network address of the node or -1 if not found or lookup failed.
    */
-  int16_t getAddress(uint8_t nodeID);
+  static int16_t getAddress(uint8_t nodeID);
 
   /**
    * Write to a specific node by RF24Network address.
    *
    */
-  bool write(uint16_t to_node, const void* data, uint8_t msg_type, size_t size );
+  static bool write(uint16_t to_node, const void* data, uint8_t msg_type, size_t size );
   
   /**
   * Change the active radio channel after the mesh has been started.
@@ -195,7 +196,7 @@ public:
   * Allow child nodes to discover and attach to this node.
   * @param allow True to allow children, False to prevent children from attaching automatically.
   */
-  void setChild(bool allow);
+  static void setChild(bool allow);
   
   /**
   * Set/change a nodeID/RF24Network Address pair manually on the master node.
@@ -210,10 +211,10 @@ public:
   * @param address The octal RF24Network address to assign
   * @return If the nodeID exists in the list, 
   */
-  void setAddress(uint8_t nodeID, uint16_t address);
+  static void setAddress(uint8_t nodeID, uint16_t address);
   
-  void saveDHCP();
-  void loadDHCP();
+  static void saveDHCP();
+  static void loadDHCP();
   
   /**@}*/
   /**
@@ -225,7 +226,7 @@ public:
 
   /**@}*/
 
-  uint8_t _nodeID;
+  static uint8_t _nodeID;
 
 
 #if !defined RF24TINY
@@ -235,8 +236,8 @@ public:
   }addrListStruct;
 
   // Pointer used for dynamic memory allocation of address list
-  addrListStruct *addrList;  /**< See the addrListStruct class reference */
-  uint8_t addrListTop;       /**< The number of entries in the assigned address list */
+  static addrListStruct *addrList;  /**< See the addrListStruct class reference */
+  static uint8_t addrListTop;       /**< The number of entries in the assigned address list */
 #endif
 
   /**
@@ -249,17 +250,17 @@ public:
   /**
    * Calls setAddress()
    */
-  void setStaticAddress(uint8_t nodeID, uint16_t address);
+  static void setStaticAddress(uint8_t nodeID, uint16_t address);
   
   private:
   //RF24& radio;
   //RF24Network& network;
-  bool findNodes(RF24NetworkHeader& header, uint8_t level, uint16_t *address); /**< Broadcasts to all multicast levels to find available nodes **/
-  bool requestAddress(uint8_t level); /**< Actual requesting of the address once a contact node is discovered or supplied **/
-  bool waitForAvailable(uint32_t timeout); /**< Waits for data to become available */
-  bool doDHCP; /**< Indicator that an address request is available */
+  static bool findNodes(RF24NetworkHeader& header, uint8_t level, uint16_t *address); /**< Broadcasts to all multicast levels to find available nodes **/
+  static bool requestAddress(uint8_t level); /**< Actual requesting of the address once a contact node is discovered or supplied **/
+  static bool waitForAvailable(uint32_t timeout); /**< Waits for data to become available */
+  static bool doDHCP; /**< Indicator that an address request is available */
   //uint8_t radio_channel;
-  uint16_t lastID,lastAddress;
+  static uint16_t lastID,lastAddress;
 
  };
  
